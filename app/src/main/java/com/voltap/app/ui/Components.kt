@@ -27,7 +27,10 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -82,7 +85,7 @@ fun ScreenColumn(
                             .border(1.dp, c.border, CircleShape)
                             .clickable(onClick = onBack),
                         contentAlignment = Alignment.Center,
-                    ) { VtText("‹", 26) }
+                    ) { VtText(if (LocalLayoutDirection.current == LayoutDirection.Rtl) "›" else "‹", 26) }
                     Spacer(Modifier.width(14.dp))
                 }
                 VtText(title, 24, FontWeight.ExtraBold)
@@ -190,7 +193,7 @@ fun NavRow(title: String, sub: String?, divider: Boolean = true, onClick: () -> 
             VtText(title, 16)
             if (sub != null) VtText(sub, 13, FontWeight.Medium, c.sub)
         }
-        VtText("›", 24, FontWeight.Medium, c.sub)
+        VtText(if (LocalLayoutDirection.current == LayoutDirection.Rtl) "‹" else "›", 24, FontWeight.Medium, c.sub)
     }
     if (divider) HorizontalDivider(color = c.border)
 }
@@ -244,4 +247,15 @@ fun Segmented(
         }
     }
     if (divider) HorizontalDivider(color = c.border)
+}
+
+/** "VolTap" always reads left to right, whatever the app language. */
+@Composable
+fun BrandName(size: Int, volColor: Color = LocalVt.current.text, tapColor: Color = LocalVt.current.accent, modifier: Modifier = Modifier) {
+    CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
+        Row(modifier) {
+            VtText("Vol", size, FontWeight.ExtraBold, volColor)
+            VtText("Tap", size, FontWeight.ExtraBold, tapColor)
+        }
+    }
 }

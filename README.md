@@ -7,10 +7,14 @@ Android only. Written in Kotlin with Jetpack Compose.
 ## How it works
 
 1. **Add an app** under *App profiles* (a game, a camera, a reader, anything).
-2. Press **Set tap positions**. VolTap opens the app and shows two rings over it. Drag the blue ring (Volume Up) and the red ring (Volume Down) onto the buttons you want tapped. Use the arrow buttons for 1 px precision, then **Lock positions**.
+2. Press **Choose a screenshot**. Pick a screenshot of that app, taken on this phone. Tap or drag on it to put the blue ring (Volume Up) and the red ring (Volume Down) on the buttons you want tapped. A magnifier and 1 px arrow buttons help you be exact, then **Save positions**.
 3. Open the app any time. VolTap detects it and turns on. Volume keys now tap the saved spots. Leave the app and the keys behave normally again.
 
-Positions are saved separately for portrait and landscape. Rotate the phone before pressing *Set tap positions* to set the other orientation.
+Positions are saved separately for portrait and landscape. Take the screenshot in the other orientation to set those positions (VolTap reads the orientation from the screenshot).
+
+### Languages
+
+English and Arabic (full right-to-left layout). Settings → Appearance → Language lets you follow the system or pick one.
 
 ### Per-app options
 
@@ -55,7 +59,9 @@ The APK is written to `app/build/outputs/apk/debug/`. The GitHub Actions workflo
 ```
 app/src/main/java/com/voltap/app/
   VolTapService.kt   accessibility service: app detection, key handling, taps, latency test
-  Overlays.kt        tap-position editor and faint ring markers
+  Overlays.kt        faint ring markers over the app
+  Lang.kt            in-app language
+  ui/ShotScreen.kt   screenshot-based tap placement
   Models.kt          profiles, settings, storage
   MainActivity.kt    navigation
   ui/                theme, logo, shared components, screens
@@ -63,4 +69,4 @@ app/src/main/java/com/voltap/app/
 
 ## Status
 
-The code was written without access to the Android SDK, so it has not been compiled or run on a device yet. If the first build reports errors, they should be small. Open an issue with the log.
+Built by GitHub Actions on every push; the newest APK is on the Releases page (`latest`).

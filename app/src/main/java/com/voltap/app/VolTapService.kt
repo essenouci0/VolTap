@@ -50,7 +50,6 @@ class VolTapService : AccessibilityService() {
 
     private var currentPackage: String = ""
     private var active: Profile? = null
-    private var placement: PlacementOverlay? = null
     private var markers: MarkersOverlay? = null
 
     private var repeatPoint: TapPoint? = null
@@ -95,8 +94,6 @@ class VolTapService : AccessibilityService() {
 
     private fun shutdown() {
         stopRepeat()
-        placement?.close()
-        placement = null
         markers?.hide()
         markers = null
         active = null
@@ -107,7 +104,6 @@ class VolTapService : AccessibilityService() {
 
     override fun onAccessibilityEvent(event: AccessibilityEvent) {
         if (event.eventType != AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED) return
-        if (placement != null) return
         val pkg = event.packageName?.toString() ?: return
         val cls = event.className?.toString().orEmpty()
 
@@ -142,7 +138,8 @@ class VolTapService : AccessibilityService() {
         stopRepeat()
         refreshMarkers()
         if (changed && next != null && VolTapStore.settings.showNotice) {
-            Toast.makeText(this, "VolTap active · ${next.label}", Toast.LENGTH_SHORT).show()
+            val ctx = Lang.localized(applicationContext, VolTapStore.settings.language)
+            Toast.makeText(ctx, ctx.getString(R.string.toast_active, next.label), Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -161,7 +158,6 @@ class VolTapService : AccessibilityService() {
     override fun onKeyEvent(event: KeyEvent): Boolean {
         val code = event.keyCode
         if (code != KeyEvent.KEYCODE_VOLUME_UP && code != KeyEvent.KEYCODE_VOLUME_DOWN) return false
-        if (placement != null) return false
 
         val profile = resolveActive() ?: return false
         val positions = profile.positions(isLandscape()) ?: return false
@@ -205,24 +201,6 @@ class VolTapService : AccessibilityService() {
     private fun stopRepeat() {
         handler.removeCallbacks(repeatRunnable)
         repeatPoint = null
-    }
-
-    // ---- placing the targets ---------------------------------------------------
-
-    /** Shows the draggable targets over the app that was just opened. */
-    fun startPlacement(packageName: String, delayMs: Long = 900L) {
-        handler.postDelayed({
-            val profile = VolTapStore.profiles.firstOrNull { it.packageName == packageName }
-                ?: return@postDelayed
-            placement?.close()
-            stopRepeat()
-            markers?.hide()
-            active = null
-            placement = PlacementOverlay(this, profile, isLandscape()) {
-                placement = null
-                updateActivation()
-            }.also { it.show() }
-        }, delayMs)
     }
 
     // ---- latency test ------------------------------------------------------------

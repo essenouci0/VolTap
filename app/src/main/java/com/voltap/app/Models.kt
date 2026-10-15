@@ -46,6 +46,8 @@ data class AppSettings(
     val ignoreTransient: Boolean = true,
     /** 0 = light, 1 = dark, 2 = system */
     val theme: Int = 0,
+    /** 0 = system, 1 = English, 2 = Arabic */
+    val language: Int = 0,
 ) {
     val tapDurationMs: Long
         get() = when (tapSpeed) {
@@ -110,6 +112,7 @@ object VolTapStore {
             .put("showNotice", s.showNotice)
             .put("ignoreTransient", s.ignoreTransient)
             .put("theme", s.theme)
+            .put("language", s.language)
         val array = JSONArray()
         profiles.forEach { array.put(profileToJson(it)) }
         p.edit()
@@ -133,6 +136,7 @@ object VolTapStore {
                     showNotice = o.optBoolean("showNotice", d.showNotice),
                     ignoreTransient = o.optBoolean("ignoreTransient", d.ignoreTransient),
                     theme = o.optInt("theme", d.theme),
+                    language = o.optInt("language", d.language),
                 )
             }
         }

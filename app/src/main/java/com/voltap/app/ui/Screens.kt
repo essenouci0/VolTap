@@ -44,7 +44,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.res.stringResource
 import com.voltap.app.Positions
+import com.voltap.app.R
 import com.voltap.app.Profile
 import com.voltap.app.VolTapService
 import com.voltap.app.VolTapStore
@@ -76,10 +79,7 @@ fun SplashScreen(onStart: () -> Unit) {
                 animate = true,
             )
             Spacer(Modifier.height(28.dp))
-            Row {
-                VtText("Vol", 52, FontWeight.ExtraBold, Color.White)
-                VtText("Tap", 52, FontWeight.ExtraBold, Color(0xFFC4C8FF))
-            }
+            BrandName(52, Color.White, Color(0xFFC4C8FF))
         }
         Box(
             Modifier
@@ -90,7 +90,7 @@ fun SplashScreen(onStart: () -> Unit) {
                 .background(Color.White)
                 .clickable(onClick = onStart),
             contentAlignment = Alignment.Center,
-        ) { VtText("Get started", 16, color = Color(0xFF3B43C7)) }
+        ) { VtText(stringResource(R.string.get_started), 16, color = Color(0xFF3B43C7)) }
     }
 }
 
@@ -117,10 +117,7 @@ fun HomeScreen(serviceEnabled: Boolean, onOpenAccessibility: () -> Unit, go: (St
                 ring = Color.White,
             )
             Spacer(Modifier.width(12.dp))
-            Row(Modifier.weight(1f)) {
-                VtText("Vol", 24, FontWeight.ExtraBold)
-                VtText("Tap", 24, FontWeight.ExtraBold, c.accent)
-            }
+            BrandName(24, modifier = Modifier.weight(1f))
             Box(
                 Modifier
                     .height(44.dp)
@@ -130,7 +127,7 @@ fun HomeScreen(serviceEnabled: Boolean, onOpenAccessibility: () -> Unit, go: (St
                     .clickable { go("settings") }
                     .padding(horizontal = 18.dp),
                 contentAlignment = Alignment.Center,
-            ) { VtText("Settings", 14) }
+            ) { VtText(stringResource(R.string.settings), 14) }
         }
         Spacer(Modifier.height(20.dp))
 
@@ -157,7 +154,7 @@ fun HomeScreen(serviceEnabled: Boolean, onOpenAccessibility: () -> Unit, go: (St
                         .background(if (on) Color(0xFF7CF0B6) else Color(0xFFD9DBF2)),
                 )
                 Spacer(Modifier.width(8.dp))
-                VtText(if (on) "Active" else "Paused", 12, color = Color.White)
+                VtText(stringResource(if (on) R.string.status_active else R.string.status_paused), 12, color = Color.White)
             }
             LogoCapsule(
                 modifier = Modifier
@@ -177,7 +174,7 @@ fun HomeScreen(serviceEnabled: Boolean, onOpenAccessibility: () -> Unit, go: (St
                     },
             )
             VtText(
-                "Volume up",
+                stringResource(R.string.vol_up),
                 13,
                 color = Color.White,
                 modifier = Modifier
@@ -185,7 +182,7 @@ fun HomeScreen(serviceEnabled: Boolean, onOpenAccessibility: () -> Unit, go: (St
                     .padding(top = 96.dp, end = 24.dp),
             )
             VtText(
-                "Volume down",
+                stringResource(R.string.vol_down),
                 13,
                 color = Color.White,
                 modifier = Modifier
@@ -193,7 +190,7 @@ fun HomeScreen(serviceEnabled: Boolean, onOpenAccessibility: () -> Unit, go: (St
                     .padding(bottom = 96.dp, start = 24.dp),
             )
             VtText(
-                "Tap the ring to turn VolTap on or off",
+                stringResource(R.string.hero_hint),
                 12,
                 FontWeight.Medium,
                 Color.White.copy(alpha = 0.85f),
@@ -206,13 +203,13 @@ fun HomeScreen(serviceEnabled: Boolean, onOpenAccessibility: () -> Unit, go: (St
         Spacer(Modifier.height(22.dp))
         Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
             VtText(
-                if (on) "Volume keys are mapped" else "Volume keys work normally",
+                stringResource(if (on) R.string.keys_mapped else R.string.keys_normal),
                 20,
                 align = TextAlign.Center,
             )
             Spacer(Modifier.height(6.dp))
             VtText(
-                if (on) "They tap while a saved app is open" else "Mappings are paused",
+                stringResource(if (on) R.string.keys_mapped_sub else R.string.keys_normal_sub),
                 14,
                 FontWeight.Medium,
                 c.sub,
@@ -224,15 +221,15 @@ fun HomeScreen(serviceEnabled: Boolean, onOpenAccessibility: () -> Unit, go: (St
             Spacer(Modifier.height(20.dp))
             VtCard(Modifier.padding(0.dp)) {
                 Column(Modifier.padding(vertical = 18.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    VtText("Accessibility service is off", 16)
+                    VtText(stringResource(R.string.acc_off_title), 16)
                     VtText(
-                        "VolTap needs it to see the volume keys and to tap. Open Accessibility settings, choose VolTap and switch it on.",
+                        stringResource(R.string.acc_off_body),
                         13,
                         FontWeight.Medium,
                         c.sub,
                     )
                     Spacer(Modifier.height(6.dp))
-                    PillButton("Open Accessibility settings", onClick = onOpenAccessibility)
+                    PillButton(stringResource(R.string.acc_open), onClick = onOpenAccessibility)
                 }
             }
         }
@@ -240,8 +237,15 @@ fun HomeScreen(serviceEnabled: Boolean, onOpenAccessibility: () -> Unit, go: (St
         Spacer(Modifier.height(20.dp))
         VtCard {
             NavRow(
-                "App profiles",
-                "${VolTapStore.profiles.size} apps · starts automatically",
+                stringResource(R.string.app_profiles),
+                stringResource(
+                    R.string.profiles_sub,
+                    LocalContext.current.resources.getQuantityString(
+                        R.plurals.apps_count,
+                        VolTapStore.profiles.size,
+                        VolTapStore.profiles.size,
+                    ),
+                ),
                 divider = false,
             ) { go("profiles") }
         }
@@ -272,20 +276,20 @@ fun ProfilesScreen(go: (String) -> Unit, back: () -> Unit) {
     val profiles = VolTapStore.profiles
     var picking by remember { mutableStateOf(false) }
 
-    ScreenColumn("App profiles", back) {
+    ScreenColumn(stringResource(R.string.app_profiles), back) {
         VtCard {
             SwitchRow(
-                "Auto-start",
-                if (settings.autoStart) "Starts when you open a saved app" else "Turn on to start with your apps",
+                stringResource(R.string.auto_start),
+                stringResource(if (settings.autoStart) R.string.auto_start_on else R.string.auto_start_off),
                 settings.autoStart,
                 divider = false,
             ) { value -> VolTapStore.updateSettings { it.copy(autoStart = value) } }
         }
 
-        SectionLabel("Your apps · ${profiles.size}")
+        SectionLabel(stringResource(R.string.your_apps, profiles.size))
         if (profiles.isEmpty()) {
             VtText(
-                "No apps yet. Add the game or app you want to control with the volume keys.",
+                stringResource(R.string.no_apps),
                 14,
                 FontWeight.Medium,
                 c.sub,
@@ -294,14 +298,20 @@ fun ProfilesScreen(go: (String) -> Unit, back: () -> Unit) {
         } else {
             VtCard {
                 profiles.forEachIndexed { index, profile ->
-                    val saved = listOfNotNull(
-                        if (profile.portrait != null) "Portrait" else null,
-                        if (profile.landscape != null) "Landscape" else null,
+                    val setText = stringResource(
+                        when {
+                            profile.portrait != null && profile.landscape != null -> R.string.sub_both_set
+                            profile.portrait != null -> R.string.sub_portrait_set
+                            profile.landscape != null -> R.string.sub_landscape_set
+                            else -> R.string.positions_not_set
+                        },
                     )
+                    val repeatText = stringResource(R.string.hold_to_repeat)
+                    val offText = stringResource(R.string.off)
                     val sub = buildString {
-                        append(if (saved.isEmpty()) "Positions not set" else saved.joinToString(" + ") + " set")
-                        if (profile.repeat) append(" · Hold to repeat")
-                        if (!profile.auto) append(" · Off")
+                        append(setText)
+                        if (profile.repeat) append(" · ").append(repeatText)
+                        if (!profile.auto) append(" · ").append(offText)
                     }
                     NavRow(profile.label, sub, divider = index != profiles.lastIndex) {
                         go("editor:" + profile.packageName)
@@ -319,10 +329,10 @@ fun ProfilesScreen(go: (String) -> Unit, back: () -> Unit) {
                 .border(2.dp, c.accent.copy(alpha = 0.45f), RoundedCornerShape(30.dp))
                 .clickable { picking = true },
             contentAlignment = Alignment.Center,
-        ) { VtText("+  Add an app", 15, color = c.accent) }
+        ) { VtText("+  " + stringResource(R.string.add_app), 15, color = c.accent) }
         Spacer(Modifier.height(14.dp))
         VtText(
-            "VolTap starts and stops with each app by itself.",
+            stringResource(R.string.profiles_footer),
             12,
             FontWeight.SemiBold,
             c.sub,
@@ -338,8 +348,8 @@ fun ProfilesScreen(go: (String) -> Unit, back: () -> Unit) {
         }
         AlertDialog(
             onDismissRequest = { picking = false },
-            confirmButton = { TextButton(onClick = { picking = false }) { Text("Cancel") } },
-            title = { Text("Choose an app") },
+            confirmButton = { TextButton(onClick = { picking = false }) { Text(stringResource(R.string.cancel)) } },
+            title = { Text(stringResource(R.string.choose_app)) },
             text = {
                 LazyColumn(Modifier.heightIn(max = 420.dp)) {
                     items(apps) { app ->
@@ -368,14 +378,17 @@ fun ProfilesScreen(go: (String) -> Unit, back: () -> Unit) {
 // One app's profile
 // ---------------------------------------------------------------------------------------------
 
+@Composable
 private fun describe(positions: Positions?): String =
-    if (positions == null) "Not set"
-    else "Up ${positions.up.x}, ${positions.up.y}  ·  Down ${positions.down.x}, ${positions.down.y}"
+    if (positions == null) stringResource(R.string.not_set)
+    else stringResource(
+        R.string.pos_summary,
+        positions.up.x, positions.up.y, positions.down.x, positions.down.y,
+    )
 
 @Composable
 fun EditorScreen(
     packageName: String,
-    serviceEnabled: Boolean,
     onPlace: (String) -> Unit,
     back: () -> Unit,
 ) {
@@ -390,56 +403,56 @@ fun EditorScreen(
     ScreenColumn(profile.label, back) {
         VtCard {
             SwitchRow(
-                "Start automatically",
-                "Turns on when this app opens",
+                stringResource(R.string.start_auto),
+                stringResource(R.string.start_auto_sub),
                 profile.auto,
                 divider = false,
             ) { value -> change { it.copy(auto = value) } }
         }
 
-        SectionLabel("Tap positions")
+        SectionLabel(stringResource(R.string.tap_positions))
         VtCard {
             Column(Modifier.padding(vertical = 14.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                VtText("Portrait", 13, color = c.sub)
+                VtText(stringResource(R.string.portrait), 13, color = c.sub)
                 VtText(describe(profile.portrait), 14)
                 HorizontalDivider(color = c.border)
-                VtText("Landscape", 13, color = c.sub)
+                VtText(stringResource(R.string.landscape), 13, color = c.sub)
                 VtText(describe(profile.landscape), 14)
                 VtText(
-                    "VolTap opens the app and shows two rings. Drag them onto the buttons you want tapped. Rotate your phone first to set landscape positions.",
+                    stringResource(R.string.shot_hint),
                     12,
                     FontWeight.Medium,
                     c.sub,
                 )
                 PillButton(
-                    if (serviceEnabled) "Set tap positions" else "Turn on the service first",
+                    stringResource(if (profile.portrait != null || profile.landscape != null) R.string.change_positions else R.string.choose_shot),
                     onClick = { onPlace(packageName) },
                 )
             }
         }
 
-        SectionLabel("In this app")
+        SectionLabel(stringResource(R.string.in_this_app))
         VtCard {
             SwitchRow(
-                "Hold to repeat",
-                "Keep tapping while the key is held",
+                stringResource(R.string.hold_to_repeat),
+                stringResource(R.string.repeat_sub),
                 profile.repeat,
             ) { value -> change { it.copy(repeat = value) } }
             if (profile.repeat) {
                 Segmented(
-                    "Repeat speed",
-                    listOf("Slow", "Normal", "Fast"),
+                    stringResource(R.string.repeat_speed),
+                    listOf(stringResource(R.string.slow), stringResource(R.string.normal), stringResource(R.string.fast)),
                     profile.repeatSpeed,
                 ) { index -> change { it.copy(repeatSpeed = index) } }
             }
             SwitchRow(
-                "Hide targets",
-                "Nothing drawn over this app",
+                stringResource(R.string.hide_targets),
+                stringResource(R.string.hide_targets_sub),
                 profile.hideTargets,
             ) { value -> change { it.copy(hideTargets = value) } }
             SwitchRow(
-                "Lock volume level",
-                "Keys never change the sound",
+                stringResource(R.string.lock_volume),
+                stringResource(R.string.lock_volume_sub),
                 profile.lockVolume,
                 divider = false,
             ) { value -> change { it.copy(lockVolume = value) } }
@@ -455,9 +468,9 @@ fun EditorScreen(
                     .padding(16.dp),
                 verticalArrangement = Arrangement.spacedBy(4.dp),
             ) {
-                VtText("Use repeat with care", 14, color = c.warnText)
+                VtText(stringResource(R.string.repeat_warn_title), 14, color = c.warnText)
                 VtText(
-                    "Some online games block automated taps. Repeating taps can put your account at risk.",
+                    stringResource(R.string.repeat_warn_body),
                     13,
                     FontWeight.Medium,
                     c.warnText,
@@ -466,7 +479,7 @@ fun EditorScreen(
         }
 
         Spacer(Modifier.height(24.dp))
-        PillButton("Done", onClick = back)
+        PillButton(stringResource(R.string.done), onClick = back)
         Spacer(Modifier.height(10.dp))
         Box(
             Modifier
@@ -478,7 +491,7 @@ fun EditorScreen(
                     back()
                 },
             contentAlignment = Alignment.Center,
-        ) { VtText("Remove this app", 14, color = c.danger) }
+        ) { VtText(stringResource(R.string.remove_app), 14, color = c.danger) }
     }
 }
 
@@ -492,18 +505,22 @@ fun SettingsScreen(serviceEnabled: Boolean, onOpenAccessibility: () -> Unit, bac
     val context = LocalContext.current
     val s = VolTapStore.settings
     var latency by remember { mutableStateOf<String?>(null) }
+    val testingText = stringResource(R.string.testing_dots)
+    val failedText = stringResource(R.string.test_failed)
+    val serviceFirst = stringResource(R.string.toast_service_first)
+    val resources = LocalContext.current.resources
     var running by remember { mutableStateOf(false) }
 
-    ScreenColumn("Settings", back) {
-        SectionLabel("Service")
+    ScreenColumn(stringResource(R.string.settings), back) {
+        SectionLabel(stringResource(R.string.service))
         VtCard {
             Row(
                 Modifier.padding(vertical = 16.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Column(Modifier.weight(1f)) {
-                    VtText("Accessibility service", 15)
-                    VtText("Needed to see the keys and tap", 13, FontWeight.Medium, c.sub)
+                    VtText(stringResource(R.string.accessibility_service), 15)
+                    VtText(stringResource(R.string.needed_sub), 13, FontWeight.Medium, c.sub)
                 }
                 Box(
                     Modifier
@@ -512,21 +529,21 @@ fun SettingsScreen(serviceEnabled: Boolean, onOpenAccessibility: () -> Unit, bac
                         .padding(horizontal = 12.dp, vertical = 6.dp),
                 ) {
                     VtText(
-                        if (serviceEnabled) "Connected" else "Off",
+                        stringResource(if (serviceEnabled) R.string.connected else R.string.off),
                         12,
                         color = if (serviceEnabled) Color(0xFF137A51) else Color(0xFFA8324F),
                     )
                 }
             }
             HorizontalDivider(color = c.border)
-            NavRow("Open system Accessibility settings", null, divider = false, onClick = onOpenAccessibility)
+            NavRow(stringResource(R.string.open_system_acc), null, divider = false, onClick = onOpenAccessibility)
         }
 
-        SectionLabel("Input engine")
+        SectionLabel(stringResource(R.string.input_engine))
         VtCard {
             Segmented(
-                "Input engine",
-                listOf("Standard", "Fast (Shizuku, soon)"),
+                stringResource(R.string.input_engine),
+                listOf(stringResource(R.string.standard), stringResource(R.string.fast_soon)),
                 0,
                 disabled = setOf(1),
             ) {}
@@ -535,9 +552,9 @@ fun SettingsScreen(serviceEnabled: Boolean, onOpenAccessibility: () -> Unit, bac
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Column(Modifier.weight(1f)) {
-                    VtText("Latency test", 15)
+                    VtText(stringResource(R.string.latency_test), 15)
                     VtText(
-                        latency ?: "Key-to-tap time on this phone",
+                        latency ?: stringResource(R.string.latency_sub),
                         13,
                         FontWeight.Medium,
                         c.sub,
@@ -551,53 +568,61 @@ fun SettingsScreen(serviceEnabled: Boolean, onOpenAccessibility: () -> Unit, bac
                         .clickable(enabled = !running) {
                             val service = VolTapService.instance
                             if (service == null) {
-                                Toast.makeText(context, "Turn on the accessibility service first", Toast.LENGTH_LONG).show()
+                                Toast.makeText(context, serviceFirst, Toast.LENGTH_LONG).show()
                             } else {
                                 running = true
-                                latency = "Testing…"
+                                latency = testingText
                                 service.measureLatency { ms ->
                                     running = false
-                                    latency = if (ms == null) "Test failed" else "About ${"%.1f".format(ms)} ms (median of 10)"
+                                    latency = if (ms == null) failedText else resources.getString(R.string.latency_result, "%.1f".format(ms))
                                 }
                             }
                         }
                         .padding(horizontal = 18.dp),
                     contentAlignment = Alignment.Center,
-                ) { VtText(if (running) "Testing" else "Run test", 14, color = Color.White) }
+                ) { VtText(stringResource(if (running) R.string.testing else R.string.run_test), 14, color = Color.White) }
             }
         }
 
-        SectionLabel("Behavior")
+        SectionLabel(stringResource(R.string.behavior))
         VtCard {
-            Segmented("Tap speed", listOf("Slow", "Normal", "Fast"), s.tapSpeed) { index ->
+            Segmented(stringResource(R.string.tap_speed), listOf(stringResource(R.string.slow), stringResource(R.string.normal), stringResource(R.string.fast)), s.tapSpeed) { index ->
                 VolTapStore.updateSettings { it.copy(tapSpeed = index) }
             }
-            SwitchRow("Show targets", "Faint rings over other apps", s.showTargets) { value ->
+            SwitchRow(stringResource(R.string.show_targets), stringResource(R.string.show_targets_sub), s.showTargets) { value ->
                 VolTapStore.updateSettings { it.copy(showTargets = value) }
             }
-            SwitchRow("Vibrate on tap", "A short pulse after each tap", s.vibrate, divider = false) { value ->
+            SwitchRow(stringResource(R.string.vibrate), stringResource(R.string.vibrate_sub), s.vibrate, divider = false) { value ->
                 VolTapStore.updateSettings { it.copy(vibrate = value) }
             }
         }
 
-        SectionLabel("Auto-start")
+        SectionLabel(stringResource(R.string.auto_start))
         VtCard {
-            SwitchRow("Show start notice", "A brief note when an app profile starts", s.showNotice) { value ->
+            SwitchRow(stringResource(R.string.show_notice), stringResource(R.string.show_notice_sub), s.showNotice) { value ->
                 VolTapStore.updateSettings { it.copy(showNotice = value) }
             }
             SwitchRow(
-                "Ignore keyboard and shade",
-                "They don't count as leaving the app",
+                stringResource(R.string.ignore_transient),
+                stringResource(R.string.ignore_transient_sub),
                 s.ignoreTransient,
                 divider = false,
             ) { value -> VolTapStore.updateSettings { it.copy(ignoreTransient = value) } }
         }
 
-        SectionLabel("Appearance")
+        SectionLabel(stringResource(R.string.appearance))
         VtCard {
-            Segmented("Theme", listOf("Light", "Dark", "System"), s.theme, divider = false) { index ->
-                VolTapStore.updateSettings { it.copy(theme = index) }
-            }
+            Segmented(
+                stringResource(R.string.theme),
+                listOf(stringResource(R.string.light), stringResource(R.string.dark), stringResource(R.string.system)),
+                s.theme,
+            ) { index -> VolTapStore.updateSettings { it.copy(theme = index) } }
+            Segmented(
+                stringResource(R.string.language),
+                listOf(stringResource(R.string.system), stringResource(R.string.lang_english), stringResource(R.string.lang_arabic)),
+                s.language,
+                divider = false,
+            ) { index -> VolTapStore.updateSettings { it.copy(language = index) } }
         }
     }
 }
